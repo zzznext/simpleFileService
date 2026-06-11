@@ -44,6 +44,17 @@
             border-radius: 5px;
             text-decoration: none;
             transition: all 0.3s;
+            margin-right: 10px;
+        }
+        
+        .profile-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 20px;
+            border: 2px solid white;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s;
         }
         
         .logout-btn:hover {
@@ -219,13 +230,33 @@
             color: #999;
             padding: 40px;
         }
+        
+        /* 文件类型图标样式 */
+        .file-icon {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            vertical-align: middle;
+            font-size: 20px;
+        }
+        
+        .file-name-cell {
+            display: flex;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
     <div class="header">
         <div class="header-content">
             <h1>📁 文件管理</h1>
-            <a href="/logout" class="logout-btn">退出登录</a>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <!-- 管理员链接 -->
+                <a href="/admin/users" class="profile-btn" th:if="${isAdmin}">👥 用户管理</a>
+                <a href="/account/profile" class="profile-btn">👤 个人信息</a>
+                <a href="/logout" class="logout-btn">退出登录</a>
+            </div>
         </div>
     </div>
     
@@ -278,13 +309,27 @@
                     </thead>
                     <tbody>
                         <tr th:each="file : ${files}">
-                            <td th:text="${file.originalFilename}">filename.zip</td>
+                            <td>
+                                <div class="file-name-cell">
+                                    <!-- 根据文件扩展名显示不同图标 -->
+                                    <span class="file-icon" th:text="${#strings.endsWith(#strings.toLowerCase(file.originalFilename), '.jpg') or #strings.endsWith(#strings.toLowerCase(file.originalFilename), '.jpeg') ? '🖼️' : 
+                                        (#strings.endsWith(#strings.toLowerCase(file.originalFilename), '.png') ? '🖼️' :
+                                        (#strings.endsWith(#strings.toLowerCase(file.originalFilename), '.gif') ? '🖼️' :
+                                        (#strings.endsWith(#strings.toLowerCase(file.originalFilename), '.webp') ? '🖼️' :
+                                        (#strings.endsWith(#strings.toLowerCase(file.originalFilename), '.pdf') ? '📄' :
+                                        (#strings.endsWith(#strings.toLowerCase(file.originalFilename), '.doc') or #strings.endsWith(#strings.toLowerCase(file.originalFilename), '.docx') ? '📝' :
+                                        (#strings.endsWith(#strings.toLowerCase(file.originalFilename), '.txt') ? '📃' :
+                                        (#strings.endsWith(#strings.toLowerCase(file.originalFilename), '.csv') ? '📊' :
+                                        (#strings.endsWith(#strings.toLowerCase(file.originalFilename), '.zip') or #strings.endsWith(#strings.toLowerCase(file.originalFilename), '.rar') or #strings.endsWith(#strings.toLowerCase(file.originalFilename), '.7z') ? '📦' : '📁'))))))))}"/> 
+                                    <span th:text="${file.originalFilename}">filename.zip</span>
+                                </div>
+                            </td>
                             <td th:text="${file.fileSize != null and file.fileSize > 0 ? (#numbers.formatDecimal(file.fileSize / 1024.0, 1, 2) + ' KB') : '0 KB'}">0 KB</td>
                             <td th:text="${file.uploadedAt != null ? #temporals.format(file.uploadedAt, 'yyyy-MM-dd HH:mm:ss') : '-'}">-</td>
                             <td>
                                 <button class="action-btn copy-btn" 
-                                        th:data-filename="${file.filename}"
-                                        onclick="copyLink(this.getAttribute('data-filename'))">
+                                        th:data-filepath="${file.filePath}"
+                                        onclick="copyLink(this.getAttribute('data-filepath'))">
                                     复制链接
                                 </button>
                                 <form th:action="@{'/delete/' + ${file.id}}" method="post" style="display: inline;">

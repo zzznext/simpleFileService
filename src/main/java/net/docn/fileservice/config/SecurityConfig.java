@@ -28,6 +28,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/captcha", "/css/**", "/js/**").permitAll()
                 .requestMatchers("/download/**").permitAll()
+                .requestMatchers("/admin/**").hasRole("ADMIN") // 仅管理员可访问
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form

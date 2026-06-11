@@ -54,6 +54,14 @@ public class FileController {
             model.addAttribute("usedStorage", formatSize(usedStorage));
             model.addAttribute("availableStorage", formatSize(availableStorage));
             model.addAttribute("maxStorage", formatSize(maxStorage));
+            
+            // 判断是否为管理员
+            if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+                CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+                model.addAttribute("isAdmin", userDetails.isAdmin());
+            } else {
+                model.addAttribute("isAdmin", false);
+            }
         }
         
         return "files";
@@ -118,22 +126,78 @@ public class FileController {
     /**
      * 下载文件（无需登录）
      */
-    @GetMapping("/download/{filename}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {
+    @GetMapping("/download/{*filePath}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable String filePath) {
         try {
-            Path filePath = fileStorageService.downloadFile(filename);
-            Resource resource = new UrlResource(filePath.toUri());
+            log.info("下载请求: {}", filePath);
+            
+            Path file = fileStorageService.downloadFile(filePath);
+            Resource resource = new UrlResource(file.toUri());
 
             if (!resource.exists() || !resource.isReadable()) {
+                log.warn("文件不存在或不可读: {}", filePath);
                 return ResponseEntity.notFound().build();
             }
 
+            // 从路径中提取原始文件名
+            String originalFilename = filePath.substring(filePath.indexOf("/") + 1);
+            // 去掉 UUID 前缀
+            if (originalFilename.contains("_")) {
+                originalFilename = originalFilename.substring(originalFilename.indexOf("_") + 1);
+            }
+            
+            // 根据文件扩展名确定 Content-Type
+            MediaType contentType = getMediaTypeByFilename(originalFilename);
+            
+            // URL 编码文件名，支持中文
+            String encodedFilename = java.net.URLEncoder.encode(originalFilename, "UTF-8")
+                .replaceAll("\\+", "%20");
+
             return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType("application/zip"))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+                    .contentType(contentType)
+                    .header(HttpHeaders.CONTENT_DISPOSITION, 
+                        "attachment; filename=\"" + encodedFilename + "\"; filename*=UTF-8''" + encodedFilename)
                     .body(resource);
         } catch (Exception e) {
+            log.error("下载文件失败", e);
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
+     * 根据文件名确定 Media Type
+     */
+    private MediaType getMediaTypeByFilename(String filename) {
+        String extension = "";
+        int lastDotIndex = filename.lastIndexOf(".");
+        if (lastDotIndex > 0) {
+            extension = filename.substring(lastDotIndex + 1).toLowerCase();
+        }
+        
+        switch (extension) {
+            case "jpg":
+            case "jpeg":
+                return MediaType.IMAGE_JPEG;
+            case "png":
+                return MediaType.parseMediaType("image/png");
+            case "gif":
+                return MediaType.parseMediaType("image/gif");
+            case "webp":
+                return MediaType.parseMediaType("image/webp");
+            case "pdf":
+                return MediaType.parseMediaType("application/pdf");
+            case "zip":
+                return MediaType.parseMediaType("application/zip");
+            case "doc":
+                return MediaType.parseMediaType("application/msword");
+            case "docx":
+                return MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+            case "txt":
+                return MediaType.TEXT_PLAIN;
+            case "csv":
+                return MediaType.parseMediaType("text/csv");
+            default:
+                return MediaType.APPLICATION_OCTET_STREAM;
         }
     }
 

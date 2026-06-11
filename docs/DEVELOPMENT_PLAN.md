@@ -18,24 +18,24 @@
 ## 🎯 里程碑规划
 
 ### 里程碑 1: 基础架构改造（第 1 周）
-**目标**: 完成数据库扩展、目录结构调整、文件迁移
+**目标**: 完成数据库扩展、目录结构设计
 
 | 任务 | 工时 | 负责人 | 状态 |
 |------|------|--------|------|
 | 数据库 schema 变更 | 1 天 | 后端 | ⏳ |
 | Liquibase 变更集编写 | 0.5 天 | 后端 | ⏳ |
-| 文件存储目录重构 | 1 天 | 后端 | ⏳ |
-| 数据迁移脚本开发与测试 | 2 天 | 后端 | ⏳ |
+| 文件存储目录结构设计 | 1 天 | 后端 | ⏳ |
 | 配置类扩展 | 0.5 天 | 后端 | ⏳ |
+| 用户目录自动创建逻辑 | 1 天 | 后端 | ⏳ |
 
 **交付物**:
 - ✅ 新的数据库表结构
-- ✅ 文件迁移工具
 - ✅ 更新后的配置文件
+- ✅ 用户目录自动创建功能
 
 **验收标准**:
 - [ ] 数据库字段添加成功
-- [ ] 现有文件成功迁移到用户子目录
+- [ ] 新用户目录自动创建
 - [ ] 应用正常启动无错误
 
 ---
@@ -214,7 +214,7 @@
 
 ---
 
-#### Task 1.2: 文件存储目录重构
+#### Task 1.2: 文件存储目录结构设计
 **优先级**: P0  
 **依赖**: Task 1.1
 
@@ -222,7 +222,8 @@
 1. 修改 `FileStorageProperties` 配置类
 2. 修改 `FileStorageService` 中的路径生成逻辑
 3. 新增 `getUserDirectory(Long userId)` 方法
-4. 更新文件上传时的路径拼接规则
+4. 实现用户目录自动创建功能
+5. 更新文件上传时的路径拼接规则
 
 **代码示例**:
 ```java
@@ -230,6 +231,7 @@ public Path getUserDirectory(Long userId) {
     Path userDir = rootLocation.resolve("user_" + userId).normalize();
     if (!Files.exists(userDir)) {
         Files.createDirectories(userDir);
+        log.info("为用户 {} 创建目录: {}", userId, userDir);
     }
     return userDir;
 }
@@ -243,34 +245,6 @@ Path targetPath = userDir.resolve(uniqueFilename);
 - [ ] 新用户目录自动创建
 - [ ] 文件保存到正确的用户子目录
 - [ ] 路径安全检查仍然有效
-
----
-
-#### Task 1.3: 数据迁移脚本开发
-**优先级**: P0  
-**依赖**: Task 1.2
-
-**工作内容**:
-1. 创建 `DataMigrationService` 组件
-2. 实现文件迁移逻辑：
-   - 遍历所有 file_records
-   - 移动物理文件到对应用户目录
-   - 更新数据库中的 file_path 字段
-3. 添加迁移完成标记（避免重复执行）
-4. 编写回滚脚本
-
-**迁移流程**:
-```
-旧路径: uploads/abc123-file.zip
-新路径: uploads/user_1/abc123-file.zip
-数据库更新: file_path = "user_1/abc123-file.zip"
-```
-
-**验收标准**:
-- [ ] 迁移脚本执行成功
-- [ ] 所有文件移动到正确位置
-- [ ] 数据库路径字段已更新
-- [ ] 迁移后应用正常运行
 
 ---
 
@@ -958,9 +932,9 @@ void testChangePassword_Success() {
 **目标**: 在测试环境验证所有功能
 
 **步骤**:
-1. 备份生产数据库
+1. 创建全新的测试数据库
 2. 部署新版本到测试服务器
-3. 执行数据迁移脚本
+3. Liquibase 自动初始化数据库结构
 4. 运行自动化测试套件
 5. 手动功能测试
 6. 收集反馈并修复 Bug
@@ -973,19 +947,17 @@ void testChangePassword_Success() {
 ---
 
 ### 部署阶段 2: 生产环境（第 6 周末）
-**目标**: 正式切换到新版本
+**目标**: 正式上线
 
 **步骤**:
 1. **准备阶段**（提前 1 天）
-   - 通知用户维护时间窗口
-   - 备份数据库和文件
+   - 通知用户上线时间
+   - 准备数据库和文件存储目录
    - 准备回滚方案
 
-2. **维护窗口**（预计 2 小时）
-   - 停止应用服务
-   - 备份当前版本
+2. **部署窗口**（预计 1 小时）
    - 部署新版本
-   - 执行数据迁移
+   - Liquibase 自动执行数据库初始化
    - 启动应用
    - 验证核心功能
 
@@ -1001,11 +973,11 @@ void testChangePassword_Success() {
 # 1. 停止新版本
 systemctl stop fileservice
 
-# 2. 恢复数据库
-mysql -u root -p fileservice < backup_before_migration.sql
+# 2. 删除新数据库
+mysql -u root -p -e "DROP DATABASE fileservice;"
 
-# 3. 恢复文件
-tar -xzf uploads_backup.tar.gz
+# 3. 清空文件目录
+rm -rf uploads/*
 
 # 4. 启动旧版本
 systemctl start fileservice-old

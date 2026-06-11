@@ -20,6 +20,15 @@ public class User {
     @Column(length = 100)
     private String email;
 
+    @Column(nullable = false, length = 20)
+    private String role = "USER"; // 默认角色为 USER
+
+    @Column(nullable = false)
+    private Boolean enabled = true; // 默认启用
+
+    @Column(name = "last_login_at")
+    private LocalDateTime lastLoginAt; // 最后登录时间
+
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
@@ -59,6 +68,37 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public LocalDateTime getLastLoginAt() {
+        return lastLoginAt;
+    }
+
+    public void setLastLoginAt(LocalDateTime lastLoginAt) {
+        this.lastLoginAt = lastLoginAt;
+    }
+
+    /**
+     * 判断是否为管理员
+     */
+    public boolean isAdmin() {
+        return "ADMIN".equals(this.role);
     }
 
     public LocalDateTime getCreatedAt() {

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="004-create-indexes" author="fileService">
+        <comment>创建用户和文件表的优化索引</comment>
+        
+        <!-- 用户角色索引 -->
+        <createIndex tableName="users" indexName="idx_users_role">
+            <column name="role"/>
+        </createIndex>
+        
+        <!-- 用户启用状态索引 -->
+        <createIndex tableName="users" indexName="idx_users_enabled">
+            <column name="enabled"/>
+        </createIndex>
+        
+        <!-- 文件名搜索索引 -->
+        <createIndex tableName="file_records" indexName="idx_file_records_filename">
+            <column name="original_filename"/>
+        </createIndex>
+        
+        <!-- 文件类型索引 -->
+        <createIndex tableName="file_records" indexName="idx_file_records_content_type">
+            <column name="content_type"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

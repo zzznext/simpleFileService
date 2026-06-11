@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="003-add-user-fields" author="fileService">
+        <comment>添加用户角色、启用状态和最后登录时间字段</comment>
+        
+        <!-- 添加角色字段 -->
+        <addColumn tableName="users">
+            <column name="role" type="VARCHAR(20)" defaultValue="USER">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        
+        <!-- 添加启用状态字段 -->
+        <addColumn tableName="users">
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        
+        <!-- 添加最后登录时间字段 -->
+        <addColumn tableName="users">
+            <column name="last_login_at" type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        
+        <!-- 更新默认管理员为 ADMIN 角色 -->
+        <update tableName="users">
+            <column name="role" value="ADMIN"/>
+            <where>username = 'admin'</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

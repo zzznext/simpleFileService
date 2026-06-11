@@ -5,8 +5,16 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
 
-    <!-- 正确路径 -->
+    <!-- 数据库表结构创建 -->
     <include file="classpath:db/changelog/changes/001-create-tables.xml"/>
+    
+    <!-- 插入默认管理员用户 -->
     <include file="classpath:db/changelog/changes/002-insert-default-user.xml"/>
+    
+    <!-- 添加用户角色、状态等字段 -->
+    <include file="classpath:db/changelog/changes/003-add-user-fields.xml"/>
+    
+    <!-- 创建优化索引 -->
+    <include file="classpath:db/changelog/changes/004-create-indexes.xml"/>
 
 </databaseChangeLog>

@@ -2,6 +2,7 @@ package net.docn.fileservice.service;
 
 import net.docn.fileservice.entity.User;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -21,7 +22,8 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();
+        // 根据用户角色返回对应的权限
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole()));
     }
 
     @Override
@@ -51,6 +53,20 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return user.getEnabled();
+    }
+    
+    /**
+     * 获取用户角色
+     */
+    public String getRole() {
+        return user.getRole();
+    }
+    
+    /**
+     * 判断是否为管理员
+     */
+    public boolean isAdmin() {
+        return "ADMIN".equals(user.getRole());
     }
 }

@@ -836,84 +836,21 @@ public FileRecord uploadFile(MultipartFile file, Long userId) {
 
 ---
 
-## 7. 数据迁移方案
+## 7. 数据库初始化方案
 
-### 7.1 现有数据迁移
+### 7.1 说明
 
-**问题**：当前所有文件存储在 `uploads/` 根目录，需要迁移到用户子目录
+由于项目尚未上线，无需数据迁移。新项目启动时将直接创建新的数据库表结构和目录结构。
 
-**迁移步骤**：
-
-#### Step 1: 数据库备份
-```bash
-mysqldump -u root -p fileservice > backup_before_migration.sql
-```
-
-#### Step 2: 文件备份
-```bash
-tar -czf uploads_backup.tar.gz uploads/
-```
-
-#### Step 3: 执行迁移脚本
-```java
-@Component
-public class DataMigrationService {
-    
-    @Autowired
-    private FileRecordRepository fileRecordRepository;
-    
-    @Autowired
-    private UserRepository userRepository;
-    
-    @PostConstruct
-    public void migrateFilesToUserDirectories() {
-        // 仅在首次启动时执行一次
-        if (migrationCompleted()) {
-            return;
-        }
-        
-        List<FileRecord> allFiles = fileRecordRepository.findAll();
-        
-        for (FileRecord file : allFiles) {
-            try {
-                // 1. 解析旧路径
-                Path oldPath = Paths.get(file.getFilePath());
-                String filename = oldPath.getFileName().toString();
-                
-                // 2. 构建新路径
-                Path newUserDir = Paths.get("uploads/user_" + file.getUserId());
-                Files.createDirectories(newUserDir);
-                
-                Path newPath = newUserDir.resolve(filename);
-                
-                // 3. 移动文件
-                Files.move(oldPath, newPath, StandardCopyOption.REPLACE_EXISTING);
-                
-                // 4. 更新数据库
-                file.setFilePath("user_" + file.getUserId() + "/" + filename);
-                fileRecordRepository.save(file);
-                
-            } catch (IOException e) {
-                log.error("迁移文件失败: {}", file.getFilename(), e);
-            }
-        }
-        
-        markMigrationCompleted();
-        log.info("文件迁移完成，共处理 {} 个文件", allFiles.size());
-    }
-}
-```
-
-#### Step 4: 验证迁移结果
-```sql
--- 检查所有文件路径是否已更新
-SELECT COUNT(*) FROM file_records WHERE file_path NOT LIKE 'user_%';
--- 应该返回 0
-```
+**初始化步骤**：
+1. Liquibase 自动执行变更集创建表结构
+2. 应用启动时自动创建默认管理员账户
+3. 首次上传文件时自动创建用户目录
 
 ### 7.2 Liquibase 变更集
 
 **新增变更集文件**：`db/changelog/changes/003-add-user-fields.xml`
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog">
@@ -1218,7 +1155,7 @@ find backups/ -name "*.tar.gz" -mtime +7 -delete
 
 | 风险 | 影响 | 概率 | 应对措施 |
 |------|------|------|---------|
-| 数据迁移失败 | 高 | 低 | 完整备份 + 回滚脚本 |
+| 数据库初始化失败 | 高 | 低 | Liquibase 测试 + 日志监控 |
 | 文件路径泄露 | 高 | 中 | 严格路径校验 + 日志审计 |
 | 权限绕过漏洞 | 高 | 低 | 多层权限检查 + 安全测试 |
 | 大文件上传超时 | 中 | 中 | 分块上传 + 增加超时时间 |
