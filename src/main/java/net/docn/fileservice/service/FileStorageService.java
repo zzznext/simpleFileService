@@ -610,6 +610,13 @@ public class FileStorageService {
     }
     
     /**
+     * 获取所有文件（管理员）- 返回完整列表
+     */
+    public List<FileRecord> getAllFiles() {
+        return fileRecordRepository.findAllByOrderByUploadedAtDesc();
+    }
+    
+    /**
      * 删除任意文件（管理员）
      * @param fileId 文件ID
      */

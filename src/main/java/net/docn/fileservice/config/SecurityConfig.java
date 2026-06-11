@@ -15,6 +15,9 @@ public class SecurityConfig {
     @Autowired
     private CaptchaFilter captchaFilter;
 
+    @Autowired
+    private CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -33,7 +36,7 @@ public class SecurityConfig {
             )
             .formLogin(form -> form
                 .loginPage("/login")
-                .defaultSuccessUrl("/files", true)
+                .successHandler(customAuthenticationSuccessHandler) // 使用自定义认证成功处理器
                 .permitAll()
             )
             .logout(logout -> logout

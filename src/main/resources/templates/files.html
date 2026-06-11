@@ -253,6 +253,7 @@
             <h1>📁 文件管理</h1>
             <div style="display: flex; gap: 10px; align-items: center;">
                 <!-- 管理员链接 -->
+                <a href="/admin/dashboard" class="profile-btn" th:if="${isAdmin}">🎛️ 控制台</a>
                 <a href="/admin/users" class="profile-btn" th:if="${isAdmin}">👥 用户管理</a>
                 <a href="/account/profile" class="profile-btn">👤 个人信息</a>
                 <a href="/logout" class="logout-btn">退出登录</a>
