@@ -16,5 +16,11 @@
     
     <!-- 创建优化索引 -->
     <include file="classpath:db/changelog/changes/004-create-indexes.xml"/>
+    
+    <!-- 创建系统配置表 -->
+    <include file="classpath:db/changelog/changes/005-create-system-config-table.xml"/>
+    
+    <!-- 插入系统配置初始数据 -->
+    <include file="classpath:db/changelog/changes/006-insert-system-config-data.xml"/>
 
 </databaseChangeLog>

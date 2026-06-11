@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="005-create-system-config-table" author="admin">
+        <createTable tableName="system_config" remarks="系统配置表">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            
+            <column name="config_key" type="VARCHAR(100)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            
+            <column name="config_value" type="TEXT">
+                <constraints nullable="true"/>
+            </column>
+            
+            <column name="config_type" type="VARCHAR(20)" defaultValue="STRING">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="config_group" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="description" type="VARCHAR(500)">
+                <constraints nullable="true"/>
+            </column>
+            
+            <column name="is_editable" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="created_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="updated_at" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <addUniqueConstraint tableName="system_config" columnNames="config_key" constraintName="uk_config_key"/>
+        
+        <createIndex tableName="system_config" indexName="idx_config_group">
+            <column name="config_group"/>
+        </createIndex>
+        
+        <createIndex tableName="system_config" indexName="idx_config_key">
+            <column name="config_key"/>
+        </createIndex>
+        
+        <comment>创建系统配置表，用于存储系统的各项配置参数</comment>
+    </changeSet>
+
+</databaseChangeLog>

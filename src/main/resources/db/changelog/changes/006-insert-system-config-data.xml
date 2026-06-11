@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="006-insert-system-config-data" author="admin">
+        
+        <!-- ==================== 存储配置 ==================== -->
+        
+        <insert tableName="system_config">
+            <column name="config_key" value="storage.max_total_size_gb"/>
+            <column name="config_value" value="100"/>
+            <column name="config_type" value="INTEGER"/>
+            <column name="config_group" value="STORAGE"/>
+            <column name="description" value="系统总存储容量（GB）"/>
+            <column name="is_editable" valueBoolean="true"/>
+            <column name="created_at" valueComputed="NOW()"/>
+            <column name="updated_at" valueComputed="NOW()"/>
+        </insert>
+        
+        <insert tableName="system_config">
+            <column name="config_key" value="storage.user_quota_gb"/>
+            <column name="config_value" value="10"/>
+            <column name="config_type" value="INTEGER"/>
+            <column name="config_group" value="STORAGE"/>
+            <column name="description" value="单用户存储配额（GB）"/>
+            <column name="is_editable" valueBoolean="true"/>
+            <column name="created_at" valueComputed="NOW()"/>
+            <column name="updated_at" valueComputed="NOW()"/>
+        </insert>
+        
+        <insert tableName="system_config">
+            <column name="config_key" value="storage.warning_threshold_percent"/>
+            <column name="config_value" value="80"/>
+            <column name="config_type" value="INTEGER"/>
+            <column name="config_group" value="STORAGE"/>
+            <column name="description" value="存储警告阈值（%）"/>
+            <column name="is_editable" valueBoolean="true"/>
+            <column name="created_at" valueComputed="NOW()"/>
+            <column name="updated_at" valueComputed="NOW()"/>
+        </insert>
+        
+        <insert tableName="system_config">
+            <column name="config_key" value="upload.max_file_size_mb"/>
+            <column name="config_value" value="10"/>
+            <column name="config_type" value="INTEGER"/>
+            <column name="config_group" value="STORAGE"/>
+            <column name="description" value="单个文件最大大小（MB）"/>
+            <column name="is_editable" valueBoolean="true"/>
+            <column name="created_at" valueComputed="NOW()"/>
+            <column name="updated_at" valueComputed="NOW()"/>
+        </insert>
+        
+        <insert tableName="system_config">
+            <column name="config_key" value="upload.daily_quota"/>
+            <column name="config_value" value="100"/>
+            <column name="config_type" value="INTEGER"/>
+            <column name="config_group" value="STORAGE"/>
+            <column name="description" value="每日上传配额（个）"/>
+            <column name="is_editable" valueBoolean="true"/>
+            <column name="created_at" valueComputed="NOW()"/>
+            <column name="updated_at" valueComputed="NOW()"/>
+        </insert>
+        
+        <!-- ==================== 文件类型配置 ==================== -->
+        
+        <insert tableName="system_config">
+            <column name="config_key" value="file.allowed_extensions"/>
+            <column name="config_value" value="jpg,jpeg,png,gif,webp,pdf,doc,docx,xls,xlsx,ppt,pptx,txt,csv,zip,rar,7z"/>
+            <column name="config_type" value="STRING"/>
+            <column name="config_group" value="FILE"/>
+            <column name="description" value="允许的文件扩展名（逗号分隔）"/>
+            <column name="is_editable" valueBoolean="true"/>
+            <column name="created_at" valueComputed="NOW()"/>
+            <column name="updated_at" valueComputed="NOW()"/>
+        </insert>
+        
+        <insert tableName="system_config">
+            <column name="config_key" value="file.enable_mime_check"/>
+            <column name="config_value" value="false"/>
+            <column name="config_type" value="BOOLEAN"/>
+            <column name="config_group" value="FILE"/>
+            <column name="description" value="启用 MIME 类型检查"/>
+            <column name="is_editable" valueBoolean="true"/>
+            <column name="created_at" valueComputed="NOW()"/>
+            <column name="updated_at" valueComputed="NOW()"/>
+        </insert>
+        
+        <insert tableName="system_config">
+            <column name="config_key" value="file.validation_mode"/>
+            <column name="config_value" value="extension"/>
+            <column name="config_type" value="STRING"/>
+            <column name="config_group" value="FILE"/>
+            <column name="description" value="文件验证模式: extension（扩展名）, mime（MIME类型）, strict（严格）"/>
+            <column name="is_editable" valueBoolean="true"/>
+            <column name="created_at" valueComputed="NOW()"/>
+            <column name="updated_at" valueComputed="NOW()"/>
+        </insert>
+        
+        <!-- ==================== 安全策略配置 ==================== -->
+        
+        <insert tableName="system_config">
+            <column name="config_key" value="security.min_password_length"/>
+            <column name="config_value" value="6"/>
+            <column name="config_type" value="INTEGER"/>
+            <column name="config_group" value="SECURITY"/>
+            <column name="description" value="最小密码长度"/>
+            <column name="is_editable" valueBoolean="true"/>
+            <column name="created_at" valueComputed="NOW()"/>
+            <column name="updated_at" valueComputed="NOW()"/>
+        </insert>
+        
+        <insert tableName="system_config">
+            <column name="config_key" value="security.require_uppercase"/>
+            <column name="config_value" value="false"/>
+            <column name="config_type" value="BOOLEAN"/>
+            <column name="config_group" value="SECURITY"/>
+            <column name="description" value="要求大写字母"/>
+            <column name="is_editable" valueBoolean="true"/>
+            <column name="created_at" valueComputed="NOW()"/>
+            <column name="updated_at" valueComputed="NOW()"/>
+        </insert>
+        
+        <insert tableName="system_config">
+            <column name="config_key" value="security.require_lowercase"/>
+            <column name="config_value" value="true"/>
+            <column name="config_type" value="BOOLEAN"/>
+            <column name="config_group" value="SECURITY"/>
+            <column name="description" value="要求小写字母"/>
+            <column name="is_editable" valueBoolean="true"/>
+            <column name="created_at" valueComputed="NOW()"/>
+            <column name="updated_at" valueComputed="NOW()"/>
+        </insert>
+        
+        <insert tableName="system_config">
+            <column name="config_key" value="security.require_digit"/>
+            <column name="config_value" value="true"/>
+            <column name="config_type" value="BOOLEAN"/>
+            <column name="config_group" value="SECURITY"/>
+            <column name="description" value="要求数字"/>
+            <column name="is_editable" valueBoolean="true"/>
+            <column name="created_at" valueComputed="NOW()"/>
+            <column name="updated_at" valueComputed="NOW()"/>
+        </insert>
+        
+        <insert tableName="system_config">
+            <column name="config_key" value="security.max_login_attempts"/>
+            <column name="config_value" value="5"/>
+            <column name="config_type" value="INTEGER"/>
+            <column name="config_group" value="SECURITY"/>
+            <column name="description" value="最大登录失败次数（0=不限制）"/>
+            <column name="is_editable" valueBoolean="true"/>
+            <column name="created_at" valueComputed="NOW()"/>
+            <column name="updated_at" valueComputed="NOW()"/>
+        </insert>
+        
+        <insert tableName="system_config">
+            <column name="config_key" value="security.account_lockout_duration"/>
+            <column name="config_value" value="30"/>
+            <column name="config_type" value="INTEGER"/>
+            <column name="config_group" value="SECURITY"/>
+            <column name="description" value="账户锁定时长（分钟）"/>
+            <column name="is_editable" valueBoolean="true"/>
+            <column name="created_at" valueComputed="NOW()"/>
+            <column name="updated_at" valueComputed="NOW()"/>
+        </insert>
+        
+        <insert tableName="system_config">
+            <column name="config_key" value="security.session_timeout"/>
+            <column name="config_value" value="30"/>
+            <column name="config_type" value="INTEGER"/>
+            <column name="config_group" value="SECURITY"/>
+            <column name="description" value="会话超时时间（分钟）"/>
+            <column name="is_editable" valueBoolean="true"/>
+            <column name="created_at" valueComputed="NOW()"/>
+            <column name="updated_at" valueComputed="NOW()"/>
+        </insert>
+        
+        <!-- ==================== 系统配置 ==================== -->
+        
+        <insert tableName="system_config">
+            <column name="config_key" value="system.maintenance_mode"/>
+            <column name="config_value" value="false"/>
+            <column name="config_type" value="BOOLEAN"/>
+            <column name="config_group" value="SYSTEM"/>
+            <column name="description" value="维护模式"/>
+            <column name="is_editable" valueBoolean="true"/>
+            <column name="created_at" valueComputed="NOW()"/>
+            <column name="updated_at" valueComputed="NOW()"/>
+        </insert>
+        
+        <insert tableName="system_config">
+            <column name="config_key" value="system.log_level"/>
+            <column name="config_value" value="INFO"/>
+            <column name="config_type" value="STRING"/>
+            <column name="config_group" value="SYSTEM"/>
+            <column name="description" value="日志级别"/>
+            <column name="is_editable" valueBoolean="true"/>
+            <column name="created_at" valueComputed="NOW()"/>
+            <column name="updated_at" valueComputed="NOW()"/>
+        </insert>
+        
+        <insert tableName="system_config">
+            <column name="config_key" value="system.log_retention_days"/>
+            <column name="config_value" value="30"/>
+            <column name="config_type" value="INTEGER"/>
+            <column name="config_group" value="SYSTEM"/>
+            <column name="description" value="日志保留天数"/>
+            <column name="is_editable" valueBoolean="true"/>
+            <column name="created_at" valueComputed="NOW()"/>
+            <column name="updated_at" valueComputed="NOW()"/>
+        </insert>
+        
+        <comment>插入系统配置初始数据</comment>
+    </changeSet>
+
+</databaseChangeLog>

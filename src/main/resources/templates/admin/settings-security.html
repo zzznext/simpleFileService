@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>安全策略配置 - 系统设置</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { background: white; padding: 20px 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .header h1 { color: #333; font-size: 24px; }
+        .back-link { color: #667eea; text-decoration: none; padding: 8px 16px; border: 2px solid #667eea; border-radius: 5px; transition: all 0.3s; }
+        .back-link:hover { background: #667eea; color: white; }
+        .alert { padding: 12px 16px; border-radius: 5px; margin-bottom: 20px; }
+        .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .tabs { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); margin-bottom: 20px; display: flex; gap: 10px; }
+        .tab { padding: 10px 20px; border-radius: 5px; text-decoration: none; color: #666; transition: all 0.3s; }
+        .tab:hover { background: #f0f0f0; }
+        .tab.active { background: #667eea; color: white; }
+        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; }
+        .form-group input[type="number"] { width: 100%; padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 5px; font-size: 14px; }
+        .form-group input:focus { outline: none; border-color: #667eea; }
+        .form-group .help-text { margin-top: 5px; color: #999; font-size: 12px; }
+        .btn { padding: 12px 24px; border: none; border-radius: 5px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.3s; }
+        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); }
+        .btn-secondary { background: #ccc; color: #333; margin-left: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚙️ 系统设置</h1>
+            <div><a href="/admin/dashboard" class="back-link">🎛️ 控制台</a></div>
+        </div>
+
+        <div th:if="${message}" class="alert alert-success" th:text="${message}"></div>
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+        <div class="tabs">
+            <a href="/admin/settings/storage" class="tab">💾 存储配置</a>
+            <a href="/admin/settings/file" class="tab">📁 文件类型</a>
+            <a href="/admin/settings/security" class="tab" th:classappend="${activeTab == 'security'} ? 'active' : ''">🔒 安全策略</a>
+            <a href="/admin/settings/system" class="tab">⚙️ 系统配置</a>
+        </div>
+
+        <div class="card">
+            <h2 style="margin-bottom: 20px;">🔒 安全策略配置</h2>
+            <form th:action="@{/admin/settings/security}" method="post">
+                <div class="form-group">
+                    <label for="security.min_password_length">最小密码长度</label>
+                    <input type="number" id="security.min_password_length" name="security.min_password_length" th:value="${configs['security.min_password_length']}" min="6" max="128" required>
+                    <div class="help-text">密码的最小字符数（6-128）</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="security.max_login_attempts">最大登录失败次数</label>
+                    <input type="number" id="security.max_login_attempts" name="security.max_login_attempts" th:value="${configs['security.max_login_attempts']}" min="0" required>
+                    <div class="help-text">超过此次数后锁定账户（0=不限制）</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="security.account_lockout_duration">账户锁定时长（分钟）</label>
+                    <input type="number" id="security.account_lockout_duration" name="security.account_lockout_duration" th:value="${configs['security.account_lockout_duration']}" min="1" required>
+                    <div class="help-text">账户被锁定后的自动解锁时间</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="security.session_timeout">会话超时时间（分钟）</label>
+                    <input type="number" id="security.session_timeout" name="security.session_timeout" th:value="${configs['security.session_timeout']}" min="1" required>
+                    <div class="help-text">用户无操作后的自动登出时间</div>
+                </div>
+
+                <div style="margin-top: 30px;">
+                    <button type="submit" class="btn btn-primary">💾 保存配置</button>
+                    <a href="/admin/settings/security" class="btn btn-secondary">🔄 重置</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
